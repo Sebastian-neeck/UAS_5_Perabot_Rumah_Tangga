@@ -354,19 +354,7 @@
         }
 
         // Floating Furniture Icons
-        function createDecor() {
-            const icons = ['armchair', 'lamp', 'sofa', 'package', 'truck'];
-            const decor = document.createElement('div');
-            decor.className = 'decor-icon';
-            const iconName = icons[Math.floor(Math.random() * icons.length)];
-            decor.innerHTML = `<i data-lucide="${iconName}" style="width:30px; height:30px; color:#fbbf24;"></i>`;
-            decor.style.left = Math.random() * 100 + 'vw';
-            decor.style.animationDuration = Math.random() * 5 + 10 + 's';
-            document.body.appendChild(decor);
-            lucide.createIcons();
-            setTimeout(() => decor.remove(), 15000);
-        }
-        setInterval(createDecor, 3000);
+        
 
         // Auto-hide alert
         setTimeout(() => {

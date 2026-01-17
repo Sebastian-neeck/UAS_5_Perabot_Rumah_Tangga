@@ -27,8 +27,7 @@
             <div class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
                 <a href="#" class="text-amber-600">Beranda</a>
                 <a href="#" class="hover:text-amber-600 transition-colors">Katalog</a>
-                <a href="#" class="hover:text-amber-600 transition-colors">Tentang Kami</a>
-                <a href="#" class="hover:text-amber-600 transition-colors">Kontak</a>
+                
             </div>
 
             <div class="flex items-center gap-4">
@@ -49,7 +48,7 @@
     <header class="relative bg-slate-50 py-20 overflow-hidden">
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div class="relative z-10">
-                <span class="text-amber-600 font-bold text-sm tracking-widest uppercase mb-4 block">Koleksi 2024</span>
+                <span class="text-amber-600 font-bold text-sm tracking-widest uppercase mb-4 block">Koleksi 2026</span>
                 <h1 class="text-5xl lg:text-7xl font-black text-slate-900 leading-tight mb-6">
                     Kenyamanan <br> Modern Untuk <br> <span class="text-amber-500 text-outline">Rumah Anda.</span>
                 </h1>
@@ -80,40 +79,7 @@
     </header>
 
     <!-- Category Filter -->
-    <section class="max-w-7xl mx-auto px-6 py-12">
-        <div class="flex items-center justify-between mb-8">
-            <h2 class="text-2xl font-black text-slate-900">Kategori Populer</h2>
-            <div class="flex gap-2">
-                <button class="w-10 h-10 border border-slate-200 rounded-full flex items-center justify-center hover:bg-amber-500 hover:border-amber-500 transition-all">
-                    <i data-lucide="chevron-left" class="w-5 h-5"></i>
-                </button>
-                <button class="w-10 h-10 border border-slate-200 rounded-full flex items-center justify-center hover:bg-amber-500 hover:border-amber-500 transition-all">
-                    <i data-lucide="chevron-right" class="w-5 h-5"></i>
-                </button>
-            </div>
-        </div>
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            @php
-                $categories = [
-                    ['name' => 'Ruang Tamu', 'icon' => 'sofa', 'count' => '120'],
-                    ['name' => 'Meja Makan', 'icon' => 'utensils', 'count' => '45'],
-                    ['name' => 'Tempat Tidur', 'icon' => 'bed', 'count' => '82'],
-                    ['name' => 'Kursi Kerja', 'icon' => 'briefcase', 'count' => '30'],
-                    ['name' => 'Lemari Pakaian', 'icon' => 'archive', 'count' => '15'],
-                    ['name' => 'Dekorasi', 'icon' => 'palette', 'count' => '200'],
-                ];
-            @endphp
-            @foreach($categories as $cat)
-            <div class="group bg-slate-50 p-6 rounded-3xl text-center hover:bg-white hover:shadow-xl transition-all cursor-pointer border border-transparent hover:border-amber-100">
-                <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-amber-500 transition-colors shadow-sm">
-                    <i data-lucide="{{ $cat['icon'] }}" class="w-6 h-6 text-slate-600 group-hover:text-slate-900"></i>
-                </div>
-                <p class="font-bold text-slate-800 text-sm mb-1">{{ $cat['name'] }}</p>
-                <p class="text-[10px] text-slate-400 font-bold uppercase">{{ $cat['count'] }} Produk</p>
-            </div>
-            @endforeach
-        </div>
-    </section>
+    
 
     <!-- Product Grid -->
     <section class="max-w-7xl mx-auto px-6 py-20">
@@ -122,11 +88,7 @@
                 <h2 class="text-4xl font-black text-slate-900 mb-2 tracking-tight">Koleksi Produk Terlaris</h2>
                 <p class="text-slate-500">Pilihan terbaik untuk melengkapi estetika rumah Anda.</p>
             </div>
-            <div class="flex gap-4 overflow-x-auto pb-2 no-scrollbar">
-                <button class="whitespace-nowrap px-6 py-2.5 bg-slate-900 text-white rounded-full text-sm font-bold">Semua</button>
-                <button class="whitespace-nowrap px-6 py-2.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-full text-sm font-bold transition-all">Terbaru</button>
-                <button class="whitespace-nowrap px-6 py-2.5 bg-slate-100 text-slate-600 hover:bg-slate-200 rounded-full text-sm font-bold transition-all">Paling Populer</button>
-            </div>
+           
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12">
@@ -149,8 +111,7 @@
                 <div class="relative aspect-[3/4] rounded-[2.5rem] overflow-hidden mb-6 bg-slate-100 shadow-inner">
                     <img src="{{ $product['img'] }}" alt="{{ $product['name'] }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <button class="absolute top-4 right-4 w-10 h-10 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center text-slate-900 hover:bg-amber-500 transition-colors shadow-lg">
-                        <i data-lucide="heart" class="w-4 h-4"></i>
+                    
                     </button>
                     <div class="absolute bottom-6 left-0 right-0 px-6 translate-y-12 group-hover:translate-y-0 transition-transform duration-500">
                         <button class="w-full bg-white text-slate-900 py-3 rounded-2xl font-bold text-sm shadow-xl flex items-center justify-center gap-2">
@@ -171,53 +132,7 @@
 
     <!-- Footer -->
     <footer class="bg-slate-900 text-slate-400 py-20 mt-20">
-        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12">
-            <div class="md:col-span-1">
-                <div class="flex items-center gap-2 mb-6">
-                    <div class="bg-amber-500 p-1.5 rounded-lg text-slate-900">
-                        <i data-lucide="armchair" class="w-5 h-5"></i>
-                    </div>
-                    <span class="text-xl font-black tracking-tight text-white">Furni<span class="text-amber-500">Stock</span></span>
-                </div>
-                <p class="text-sm leading-relaxed mb-6">
-                    Membawa kehangatan jati asli dan kenyamanan desain modern ke setiap sudut rumah Anda sejak 2024.
-                </p>
-                <div class="flex gap-4">
-                    <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-amber-500 hover:text-slate-900 transition-all">
-                        <i data-lucide="instagram" class="w-5 h-5"></i>
-                    </a>
-                    <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-amber-500 hover:text-slate-900 transition-all">
-                        <i data-lucide="facebook" class="w-5 h-5"></i>
-                    </a>
-                </div>
-            </div>
-            <div>
-                <h5 class="text-white font-bold mb-6">Produk</h5>
-                <ul class="space-y-4 text-sm font-medium">
-                    <li><a href="#" class="hover:text-amber-500 transition-colors">Ruang Tamu</a></li>
-                    <li><a href="#" class="hover:text-amber-500 transition-colors">Kamar Tidur</a></li>
-                    <li><a href="#" class="hover:text-amber-500 transition-colors">Dapur</a></li>
-                    <li><a href="#" class="hover:text-amber-500 transition-colors">Kantor</a></li>
-                </ul>
-            </div>
-            <div>
-                <h5 class="text-white font-bold mb-6">Dukungan</h5>
-                <ul class="space-y-4 text-sm font-medium">
-                    <li><a href="#" class="hover:text-amber-500 transition-colors">Pusat Bantuan</a></li>
-                    <li><a href="#" class="hover:text-amber-500 transition-colors">Cara Order</a></li>
-                    <li><a href="#" class="hover:text-amber-500 transition-colors">Kebijakan Pengembalian</a></li>
-                    <li><a href="#" class="hover:text-amber-500 transition-colors">Cek Status Pesanan</a></li>
-                </ul>
-            </div>
-            <div>
-                <h5 class="text-white font-bold mb-6">Newsletter</h5>
-                <p class="text-sm mb-4">Dapatkan info koleksi terbaru dan promo menarik.</p>
-                <div class="flex gap-2">
-                    <input type="text" placeholder="Email Anda" class="flex-1 bg-slate-800 border-none rounded-xl px-4 text-sm focus:ring-2 focus:ring-amber-500">
-                    <button class="bg-amber-500 text-slate-900 px-4 py-2 rounded-xl font-bold text-xs">Join</button>
-                </div>
-            </div>
-        </div>
+        
         <div class="max-w-7xl mx-auto px-6 mt-20 pt-8 border-t border-slate-800 text-center text-xs font-bold uppercase tracking-widest opacity-50">
             &copy; 2024 FurniStock Indonesia. All Rights Reserved.
         </div>
