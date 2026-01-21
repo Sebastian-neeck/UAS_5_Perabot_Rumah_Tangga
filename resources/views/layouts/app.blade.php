@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}"> <!-- INI YANG PERLU DITAMBAH! -->
     <title>FurniStock - Management System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -99,6 +100,12 @@
     <script>
         // Initialize Lucide Icons
         lucide.createIcons();
+        
+        // Add global CSRF token for AJAX requests
+        window.csrfToken = "{{ csrf_token() }}";
+        
+        // Log untuk debugging
+        console.log('Layout loaded, CSRF token:', window.csrfToken);
     </script>
 </body>
 </html>
