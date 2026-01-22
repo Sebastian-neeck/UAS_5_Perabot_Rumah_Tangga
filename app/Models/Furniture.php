@@ -32,7 +32,7 @@ class Furniture extends Model
     ];
 
     protected $appends = [
-        'display_image',
+        'image_url',
         'formatted_price',
         'stock_status',
         'first_image'
@@ -57,53 +57,45 @@ class Furniture extends Model
     // ============ ACCESSORS & MUTATORS ============
     
     /**
-     * Get display image (utama untuk frontend)
-     */
-    public function getDisplayImageAttribute()
-    {
-        $images = $this->images;
-        
-        // Jika kosong, return default
-        if (empty($images)) {
-            return 'https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=400&auto=format&fit=crop';
-        }
-        
-        // Ambil gambar pertama
-        $firstImage = is_array($images) ? $images[0] : $images;
-        
-        // Jika sudah URL lengkap (Unsplash)
-        if (is_string($firstImage) && str_starts_with($firstImage, 'http')) {
-            return $firstImage;
-        }
-        
-        // Jika nama file lokal
-        if (is_string($firstImage)) {
-            // Cek apakah sudah ada path furniture/
-            if (str_starts_with($firstImage, 'furniture/')) {
-                return asset('storage/' . $firstImage);
-            }
-            
-            return asset('storage/furniture/' . $firstImage);
-        }
-        
-        // Fallback
-        return 'https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=400&auto=format&fit=crop';
-    }
-
-    /**
-     * Alias for compatibility (first_image)
+     * Get the first image URL
      */
     public function getFirstImageAttribute()
     {
-        return $this->display_image;
-    }
-
-    /**
-     * Alias for image_url (compatibility)
-     */
-    public function getImageUrlAttribute()
-    {
-        return $this->display_image;
+        $images = $this->images;
+        
+        // Jika images sudah array
+        if (is_array($images) && !empty($images)) {
+            $firstImage = $images[0];
+            
+            // Jika URL lengkap (Unsplash)
+            if (str_starts_with($firstImage, 'http')) {
+                return $firstImage;
+            }
+            
+            // Jika nama file lokal
+            return asset('storage/furniture/' . $firstImage);
+        }
+        
+        // Jika images string JSON (fallback untuk data lama)
+        if (is_string($images) && !empty($images)) {
+            try {
+                $decoded = json_decode($images, true);
+                if (is_array($decoded) && !empty($decoded)) {
+                    $firstImage = $decoded[0];
+                    
+                    if (str_starts_with($firstImage, 'http')) {
+                        return $firstImage;
+                    }
+                    
+                    return asset('storage/furniture/' . $firstImage);
+                }
+            } catch (\Exception $e) {
+                // Do nothing
+            }
+        }
+        
+        // Default image
+        return 'https://images.unsplash.com/photo-1556228453-efd6c1ff04f6?w=400&auto=format&fit=crop';
     }
 
     /**
@@ -140,6 +132,14 @@ class Furniture extends Model
         }
         
         return $urls;
+    }
+
+    /**
+     * Alias for first image (compatibility)
+     */
+    public function getImageUrlAttribute()
+    {
+        return $this->first_image;
     }
 
     /**

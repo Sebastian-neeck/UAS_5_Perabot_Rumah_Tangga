@@ -136,13 +136,7 @@
                     <!-- Aksi -->
                     <td class="px-6 py-4">
                         <div class="flex justify-center gap-2">
-                            <!-- View -->
-                            <a href="{{ route('user.catalog') }}?search={{ urlencode($item->name) }}" 
-                               target="_blank"
-                               class="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:bg-blue-50 hover:text-blue-600 transition-all"
-                               title="Lihat di Katalog">
-                                <i data-lucide="eye" class="w-4 h-4"></i>
-                            </a>
+                            
                             
                             <!-- Edit -->
                             <a href="{{ route('furniture.edit', $item) }}" 

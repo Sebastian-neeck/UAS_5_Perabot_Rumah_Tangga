@@ -248,11 +248,7 @@
                 
                 <!-- Action Buttons -->
                 <div class="mt-6 flex flex-wrap gap-4 no-print">
-                    <button onclick="downloadInvoice()" 
-                            class="flex items-center gap-2 px-6 py-3 bg-amber-500 text-slate-900 font-bold rounded-xl hover:bg-amber-400 transition-all">
-                        <i data-lucide="download" class="w-4 h-4"></i>
-                        Download Invoice (PDF)
-                    </button>
+                   
                     <button onclick="window.print()" 
                             class="flex items-center gap-2 px-6 py-3 border border-slate-300 text-slate-700 font-bold rounded-xl hover:bg-slate-50 transition-all">
                         <i data-lucide="printer" class="w-4 h-4"></i>

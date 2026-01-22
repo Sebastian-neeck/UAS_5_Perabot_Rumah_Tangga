@@ -72,11 +72,7 @@
                         @method('PUT')
                         <input type="hidden" name="name" value="{{ $category->name }}">
                         <input type="hidden" name="description" value="{{ $category->description }}">
-                        <button type="submit" 
-                                class="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                                title="Edit">
-                            <i data-lucide="edit-3" class="w-4 h-4"></i>
-                        </button>
+                        
                     </form>
                     
                     <!-- Delete Form -->

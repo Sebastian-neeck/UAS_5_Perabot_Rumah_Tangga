@@ -27,7 +27,11 @@
     </div>
     @endif
     
-    <form action="{{ route('furniture.update', $furniture) }}" method="POST" class="bg-white rounded-2xl border border-slate-200 p-8">
+    <!-- PERBAIKAN: Tambah enctype="multipart/form-data" -->
+    <form action="{{ route('furniture.update', $furniture) }}" 
+          method="POST" 
+          enctype="multipart/form-data"
+          class="bg-white rounded-2xl border border-slate-200 p-8">
         @csrf
         @method('PUT')
         
@@ -89,30 +93,70 @@
             </div>
         </div>
         
-        <!-- Image Upload Section -->
+        <!-- PERBAIKAN: Image Upload Section -->
         <div class="mb-8">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-bold text-slate-700">Gambar Produk</h2>
-                <button type="button" 
-                        onclick="openImageUpload()"
-                        class="flex items-center gap-2 px-4 py-2 bg-amber-500 text-white text-sm font-bold rounded-xl hover:bg-amber-600">
-                    <i data-lucide="upload" class="w-4 h-4"></i>
-                    Upload Gambar Baru
-                </button>
+            <h2 class="text-lg font-bold text-slate-700 mb-4">Gambar Produk</h2>
+            
+            <!-- 1. Existing Images -->
+            @if(!empty($furniture->images) && is_array($furniture->images) && count($furniture->images) > 0)
+            <div class="mb-6">
+                <label class="block text-sm font-bold text-slate-700 mb-3">Gambar yang tersedia:</label>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="existingImagesContainer">
+                    @foreach($furniture->images as $index => $image)
+                    @php
+                        // Get image URL menggunakan getter dari model
+                        $imageUrls = $furniture->image_urls;
+                        $imageUrl = $imageUrls[$index] ?? '#';
+                        $isUrl = str_starts_with($image, 'http');
+                    @endphp
+                    <div class="relative group existing-image" data-image="{{ $image }}">
+                        <div class="aspect-square rounded-xl overflow-hidden border border-slate-200">
+                            <img src="{{ $imageUrl }}" 
+                                 alt="Gambar {{ $index + 1 }}" 
+                                 class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <button type="button" 
+                                        onclick="markImageForDeletion('{{ $image }}', this)"
+                                        class="p-2 bg-red-500 text-white rounded-full hover:bg-red-600">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1 truncate text-center">
+                            {{ $isUrl ? 'Unsplash Image' : (strlen($image) > 15 ? substr($image, 0, 15) . '...' : $image) }}
+                        </p>
+                        <!-- Hidden input untuk existing images -->
+                        <input type="hidden" name="existing_images[]" value="{{ $image }}">
+                    </div>
+                    @endforeach
+                </div>
+                <!-- Hidden input untuk gambar yang akan dihapus -->
+                <input type="hidden" name="deleted_images" id="deletedImagesInput" value="[]">
+            </div>
+            @endif
+            
+            <!-- 2. New Image Upload -->
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-2">
+                    Tambah Gambar Baru (Opsional)
+                </label>
+                <input type="file" 
+                       name="images[]" 
+                       id="newImages"
+                       multiple
+                       accept="image/*"
+                       class="w-full p-3 border border-slate-200 rounded-xl file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100"
+                       onchange="previewNewImages(event)">
+                <p class="text-sm text-slate-500 mt-2">
+                    Format: JPG, PNG, GIF, WEBP (maks 2MB per file)
+                </p>
             </div>
             
-            <!-- Image Preview Container -->
-            <div id="imagePreviewContainer" 
-                 class="grid grid-cols-2 md:grid-cols-4 gap-4 min-h-[200px] border-2 border-dashed border-slate-200 rounded-2xl p-6">
-                <!-- Images will be loaded here -->
+            <!-- 3. New Images Preview -->
+            <div id="newImagePreviewContainer" 
+                 class="grid grid-cols-2 md:grid-cols-4 gap-4 min-h-[100px] mt-4">
+                <!-- Preview akan muncul di sini -->
             </div>
-            
-            <!-- Hidden input untuk images -->
-            <input type="hidden" name="images" id="imagesInput" value='@json($furniture->images)'>
-            
-            <p class="text-sm text-slate-500 mt-2">
-                Klik gambar untuk menghapus. Upload gambar baru untuk menambah.
-            </p>
         </div>
         
         <!-- Status -->
@@ -131,203 +175,122 @@
         <div class="flex gap-4">
             <button type="submit" 
                     class="px-8 py-3 bg-slate-800 text-white font-bold rounded-xl hover:bg-slate-700">
+                <i data-lucide="save" class="w-4 h-4 inline mr-2"></i>
                 Update Produk
             </button>
             <a href="{{ route('furniture.index') }}" 
                class="px-8 py-3 border border-slate-300 text-slate-700 font-bold rounded-xl hover:bg-slate-50">
                 Batal
             </a>
-            <button type="button"
-                    onclick="if(confirm('Hapus produk ini?')) document.getElementById('deleteForm').submit();"
-                    class="px-8 py-3 border border-red-300 text-red-600 font-bold rounded-xl hover:bg-red-50">
-                Hapus Produk
-            </button>
         </div>
     </form>
     
-    <!-- Delete Form (hidden) -->
-    <form id="deleteForm" action="{{ route('furniture.destroy', $furniture) }}" method="POST" class="hidden">
+    <!-- Delete Form -->
+    <form id="deleteForm" action="{{ route('furniture.destroy', $furniture) }}" method="POST" class="mt-6">
         @csrf
         @method('DELETE')
+        <button type="button"
+                onclick="if(confirm('Yakin hapus produk {{ $furniture->name }}? Tindakan ini tidak dapat dibatalkan!')) this.form.submit();"
+                class="px-6 py-2 border border-red-300 text-red-600 text-sm font-bold rounded-xl hover:bg-red-50">
+            <i data-lucide="trash-2" class="w-4 h-4 inline mr-2"></i>
+            Hapus Produk
+        </button>
     </form>
-</div>
-
-<!-- Image Upload Modal (same as create) -->
-<div id="imageUploadModal" 
-     class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6">
-        <div class="flex items-center justify-between mb-6">
-            <h3 class="text-lg font-bold text-slate-800">Upload Gambar Baru</h3>
-            <button onclick="closeImageUpload()" 
-                    class="text-slate-400 hover:text-slate-600">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
-        </div>
-        
-        <div class="space-y-4">
-            <!-- Option 1: Upload from URL -->
-            <div class="border border-slate-200 rounded-xl p-4">
-                <h4 class="font-bold text-slate-700 mb-2">Gunakan URL Gambar</h4>
-                <div class="flex gap-2">
-                    <input type="text" 
-                           id="imageUrlInput"
-                           placeholder="https://images.unsplash.com/photo-..."
-                           class="flex-1 p-2 border border-slate-200 rounded-lg">
-                    <button onclick="addUrlImage()"
-                            class="px-4 py-2 bg-amber-500 text-white rounded-lg font-bold text-sm hover:bg-amber-600">
-                        Tambah
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Option 2: Upload from computer -->
-            <div class="border border-slate-200 rounded-xl p-4">
-                <h4 class="font-bold text-slate-700 mb-2">Upload dari Komputer</h4>
-                <div id="uploadArea" 
-                     class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center cursor-pointer hover:border-amber-500 hover:bg-amber-50/50 transition-all"
-                     onclick="document.getElementById('fileInput').click()">
-                    <i data-lucide="upload-cloud" class="w-8 h-8 text-slate-400 mx-auto mb-3"></i>
-                    <p class="font-bold text-slate-700 mb-1">Klik untuk pilih file</p>
-                    <p class="text-sm text-slate-500">Format: JPG, PNG, GIF (maks 2MB)</p>
-                    <input type="file" 
-                           id="fileInput" 
-                           accept="image/*" 
-                           class="hidden" 
-                           onchange="handleFileUpload(this)">
-                </div>
-            </div>
-        </div>
-        
-        <div class="mt-6 flex gap-3">
-            <button onclick="closeImageUpload()" 
-                    class="flex-1 border border-slate-300 text-slate-700 py-2 rounded-xl font-bold hover:bg-slate-50">
-                Tutup
-            </button>
-        </div>
-    </div>
 </div>
 
 <script>
     lucide.createIcons();
-    let uploadedImages = [];
+    let deletedImages = [];
     
-    // Load existing images on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        // Parse existing images from hidden input
-        const imagesInput = document.getElementById('imagesInput');
-        try {
-            uploadedImages = JSON.parse(imagesInput.value);
-        } catch (e) {
-            uploadedImages = [];
+    // Mark image for deletion
+    function markImageForDeletion(imageFilename, button) {
+        if (confirm('Hapus gambar ini?')) {
+            // Tambah ke array deleted images
+            if (!deletedImages.includes(imageFilename)) {
+                deletedImages.push(imageFilename);
+                document.getElementById('deletedImagesInput').value = JSON.stringify(deletedImages);
+            }
+            
+            // Tandai elemen sebagai akan dihapus
+            const imageDiv = button.closest('.existing-image');
+            imageDiv.classList.add('opacity-50', 'border-red-300');
+            
+            // Sembunyikan tombol hapus
+            button.style.display = 'none';
+            
+            // Nonaktifkan hidden input untuk image ini
+            const hiddenInput = imageDiv.querySelector('input[name="existing_images[]"]');
+            hiddenInput.disabled = true;
         }
-        
-        updateImagePreviews();
-    });
-    
-    // Same functions as create.blade.php
-    function openImageUpload() {
-        document.getElementById('imageUploadModal').classList.remove('hidden');
-        document.getElementById('imageUploadModal').classList.add('flex');
     }
     
-    function closeImageUpload() {
-        document.getElementById('imageUploadModal').classList.add('hidden');
-        document.getElementById('imageUploadModal').classList.remove('flex');
-        document.getElementById('imageUrlInput').value = '';
-        document.getElementById('fileInput').value = '';
-    }
-    
-    function addUrlImage() {
-        const urlInput = document.getElementById('imageUrlInput');
-        const url = urlInput.value.trim();
+    // Preview new uploaded images
+    function previewNewImages(event) {
+        const container = document.getElementById('newImagePreviewContainer');
+        const files = event.target.files;
         
-        if (!url) {
-            alert('Masukkan URL gambar');
-            return;
-        }
-        
-        if (!url.startsWith('http')) {
-            alert('URL harus diawali dengan http:// atau https://');
-            return;
-        }
-        
-        uploadedImages.push(url);
-        updateImagePreviews();
-        urlInput.value = '';
-        closeImageUpload();
-    }
-    
-    function handleFileUpload(input) {
-        const file = input.files[0];
-        if (!file) return;
-        
-        if (!file.type.startsWith('image/')) {
-            alert('Hanya file gambar yang diizinkan!');
-            return;
-        }
-        
-        if (file.size > 2 * 1024 * 1024) {
-            alert('Ukuran file maksimal 2MB!');
-            return;
-        }
-        
-        // Create object URL for preview
-        const objectUrl = URL.createObjectURL(file);
-        uploadedImages.push(objectUrl);
-        updateImagePreviews();
-        
-        closeImageUpload();
-        input.value = '';
-    }
-    
-    function updateImagePreviews() {
-        const container = document.getElementById('imagePreviewContainer');
-        const imagesInput = document.getElementById('imagesInput');
-        
-        // Update hidden input
-        imagesInput.value = JSON.stringify(uploadedImages);
-        
-        // Clear container
         container.innerHTML = '';
         
-        if (uploadedImages.length === 0) {
-            container.innerHTML = `
-                <div class="flex flex-col items-center justify-center text-slate-400 col-span-full">
-                    <i data-lucide="image" class="w-12 h-12 mb-2"></i>
-                    <p class="text-sm">Belum ada gambar</p>
-                </div>
-            `;
+        if (files.length === 0) {
             return;
         }
         
-        // Add each image
-        uploadedImages.forEach((imageUrl, index) => {
-            const imgDiv = document.createElement('div');
-            imgDiv.className = 'relative group';
-            imgDiv.innerHTML = `
-                <div class="aspect-square rounded-xl overflow-hidden border border-slate-200">
-                    <img src="${imageUrl}" 
-                         alt="Preview ${index + 1}" 
-                         class="w-full h-full object-cover cursor-pointer"
-                         onclick="removeImage(${index})">
-                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <div class="p-2 bg-red-500 text-white rounded-full">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            
+            // Validasi ukuran file
+            if (file.size > 2 * 1024 * 1024) {
+                alert(`Gambar "${file.name}" melebihi 2MB`);
+                continue;
+            }
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const imgDiv = document.createElement('div');
+                imgDiv.className = 'relative group';
+                imgDiv.innerHTML = `
+                    <div class="aspect-square rounded-lg overflow-hidden border border-slate-200">
+                        <img src="${e.target.result}" 
+                             alt="Preview ${i + 1}" 
+                             class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button type="button" 
+                                    onclick="removeNewImage(this, ${i})"
+                                    class="p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600">
+                                <i data-lucide="x" class="w-3 h-3"></i>
+                            </button>
                         </div>
                     </div>
-                </div>
-                <p class="text-xs text-slate-500 mt-1 truncate text-center">Klik untuk hapus</p>
-            `;
-            container.appendChild(imgDiv);
-        });
-        
-        setTimeout(() => lucide.createIcons(), 100);
+                    <p class="text-xs text-slate-500 mt-1 truncate">${file.name}</p>
+                    <p class="text-xs text-slate-400">${(file.size / 1024).toFixed(0)} KB</p>
+                `;
+                container.appendChild(imgDiv);
+                lucide.createIcons();
+            };
+            
+            reader.readAsDataURL(file);
+        }
     }
     
-    function removeImage(index) {
-        if (confirm('Hapus gambar ini?')) {
-            uploadedImages.splice(index, 1);
-            updateImagePreviews();
+    // Remove new image preview and from file input
+    function removeNewImage(button, index) {
+        if (confirm('Hapus gambar ini dari upload?')) {
+            const imgDiv = button.closest('.relative');
+            imgDiv.remove();
+            
+            // Hapus file dari input (DataTransfer approach)
+            const input = document.getElementById('newImages');
+            const dt = new DataTransfer();
+            
+            // Salin semua file kecuali yang dihapus
+            for (let i = 0; i < input.files.length; i++) {
+                if (i !== index) {
+                    dt.items.add(input.files[i]);
+                }
+            }
+            
+            input.files = dt.files;
         }
     }
 </script>
